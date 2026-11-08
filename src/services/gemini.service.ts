@@ -141,6 +141,10 @@ ${JSON.stringify(validatedInput, null, 2)}`;
         generationConfig: {
           responseMimeType: "application/json",
           temperature: 0.2,
+          maxOutputTokens: 1024,
+          thinkingConfig: {
+            thinkingBudget: 0,
+          },
         },
       }),
       signal: controller.signal,

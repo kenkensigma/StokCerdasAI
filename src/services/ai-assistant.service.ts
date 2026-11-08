@@ -160,7 +160,10 @@ export async function askBusinessAssistant(
         },
         generationConfig: {
           temperature: 0.3,
-          maxOutputTokens: 4096,
+          maxOutputTokens: 2048,
+          thinkingConfig: {
+            thinkingBudget: 0,
+          },
         },
       }),
       signal: controller.signal,
