@@ -1,12 +1,13 @@
 # StokCerdas AI
 
-> **"Kelola Stok Lebih Cerdas, Jalankan Bisnis Lebih Tenang."**
-> Solusi Manajemen Persediaan & Kasir Ritel Berbasis Kecerdasan Buatan untuk UMKM Bali dan Indonesia.
+> **"Kelola Stok Lebih Cerdas, Jalankan Bisnis Lebih Tenang."**  
+> Solusi Manajemen Persediaan & Kasir Ritel Berbasis Kecerdasan Buatan untuk UMKM Bali dan Indonesia.  
+> **Tim:** Ramayana — Primakara University
 
 ---
 
 ## 1. Description
-**StokCerdas AI** adalah platform SaaS manajemen inventaris dan kasir ritel multi-toko (multi-tenant) yang dirancang khusus untuk memecahkan masalah klasik UMKM: ketidakcocokan stok fisik, kehabisan barang dagangan mendadak (*stockout*), penumpukan barang yang lambat terjual (*dead stock*), dan kerugian akibat pembukuan manual yang rawan keliru.
+**StokCerdas AI** adalah platform SaaS manajemen inventaris dan kasir ritel multi-toko (multi-tenant) yang dirancang khusus untuk memecahkan masalah klasik UMKM: ketidakcocokan stok fisik, kehabisan barang dagangan mendadak (*stockout*), penumpukan barang yang lambat terjual (*overstock*), dan kerugian akibat pembukuan manual yang rawan keliru.
 
 Sistem memadukan perhitungan deterministik di sisi backend (Average Daily Sales, Reorder Point, Safety Stock) dengan kecerdasan buatan (Google Gemini API) untuk memberikan narasi rekomendasi restock proaktif dan chatbot asisten bisnis interaktif dalam Bahasa Indonesia.
 
@@ -14,70 +15,68 @@ Sistem memadukan perhitungan deterministik di sisi backend (Average Daily Sales,
 
 ## 2. Problem & Target User
 
-### Problem
-* **Selisih Stok Fisik vs Catatan**: Pembukuan manual di kertas atau Excel sering tidak sinkron dengan fisik barang di rak warung.
-* **Kehabisan Stok Kritis (*Stockout*)**: Pemilik toko terlambat memesan ulang barang ke supplier karena tidak tahu titik aman pemesanan (*Reorder Point*), sehingga kehilangan omzet penjualan.
-* **Modal Usaha Mati (*Dead Stock*)**: Pemilik toko sering over-restock barang yang jarang laku sehingga modal tertahan.
-* **Kerumitan Rumus Matematis**: Pemilik UMKM tidak memiliki waktu atau latar belakang untuk menghitung rumus inventaris yang rumit secara harian.
+### Problem (Masalah Nyata)
+* **Kehabisan Barang Saat Dibutuhkan (*Stockout*)**: Pemilik usaha sering kali baru menyadari stok barang kosong tepat ketika ada pelanggan yang ingin membeli.
+* **Penumpukan Barang (*Overstock*)**: Produk yang kurang diminati pasar tetap dibeli dan menumpuk di gudang, menyebabkan modal usaha tertahan pada barang yang tidak terjual.
+* **Kesulitan Membaca Pola Penjualan**: Meskipun terdapat catatan transaksi, pemilik usaha kesulitan menganalisis produk mana yang paling cepat atau lambat terjual.
+* **Pembelian Berdasarkan Asumsi**: Keputusan restock hanya didasarkan pada perkiraan atau kebiasaan semata, bukan berdasarkan data riil penjualan.
 
 ### Target User
-* **Pemilik Toko Kelontong, Warung Madura, & Minimarket Lokal** di Bali dan Indonesia.
-* **Kasir & Staf Operasional Toko** yang membutuhkan aplikasi pencatatan transaksi cepat dan anti-ganda.
+* **Pengguna Utama**: Pelaku Usaha Mikro, Kecil, dan Menengah (UMKM) yang menjual produk fisik, khususnya pemilik toko kelontong, minimarket kecil, toko makanan/minuman kemasan, dan toko perlengkapan rumah tangga skala kecil.
+* **Staf Toko / Kasir**: Pegawai yang bertugas mencatat transaksi harian di kasir dan menerima pasokan barang masuk dari supplier.
 
 ---
 
-## 3. Key Features
+## 3. Key Features (Fitur Utama MVP)
 
-1. **Kasir POS & Transaksi Atomik Idempoten**:
-   - Pencatatan penjualan real-time dengan barcode scanner/SKU search.
-   - Eksekusi pengurangan stok secara atomik di level database PostgreSQL melalui stored procedure ber-lock baris (`record_sale`).
-   - Anti-klik ganda dan penolakan otomatis jika stok tidak mencukupi.
-2. **Audit Trail Mutasi Stok Lengkap**:
-   - Rekam jejak seluruh arus barang (`INITIAL_STOCK`, `STOCK_IN`, `SALE`, `ADJUSTMENT_IN/OUT`, `VOID_REVERSAL`).
-   - Fitur Stock Opname fisik dengan alasan selisih stok wajib diisi.
-3. **Multi-Tenant & Role-Based Access Control (RBAC)**:
-   - Partisi data per toko dilindungi oleh **Row-Level Security (RLS)** PostgreSQL.
-   - Peran terpisah: `OWNER` (akses penuh, void transaksi, tim, laporan) dan `STAFF` (kasir & catat stok masuk).
-4. **Kalkulator Inventaris Deterministik**:
-   - **Rata-rata Penjualan Harian (ADS)**: $\text{Total Penjualan} / \text{Jumlah Hari Data}$
-   - **Estimasi Hari Stok Habis**: $\text{Stok Saat Ini} / \text{ADS}$
-   - **Titik Pemesanan Ulang (ROP)**: $(\text{ADS} \times \text{Lead Time}) + \text{Safety Stock}$
-   - **Saran Jumlah Restock**: $\text{Target Persediaan} - \text{Stok Saat Ini}$
-   - **Data Confidence Level**: Evaluasi tingkat kematangan data (`WAITING`, `LIMITED`, `EARLY`, `HIGH`).
+1. **Dashboard Ringkasan Operasional**:
+   - Memantau kondisi persediaan, metrik total produk, total stok fisik, omzet hari ini, dan daftar produk yang memerlukan restock secara real-time.
+2. **Product Management (Katalog Produk)**:
+   - Pencatatan produk lengkap dengan SKU, kategori barang, harga modal, harga jual, stok fisik, dan batas stok pengaman (*safety stock*). Mode baca (read-only) untuk staf dan kelola penuh untuk pemilik.
+3. **Stock Management & Audit Trail Mutasi**:
+   - Pemantauan stok fisik otoritatif di level database PostgreSQL.
+   - Pencatatan arus barang masuk (*Stock In*) dan penyesuaian opname fisik dengan alasan selisih stok.
+4. **Sales Recording (Kasir POS Cepat)**:
+   - Pencatatan transaksi kasir real-time dengan pemotongan stok otomatis dan atomik melalui stored procedure ber-lock baris (`record_sale`).
+   - Anti-klik ganda (*idempotent*) dan penolakan otomatis jika stok habis.
 5. **AI Inventory Analyzer**:
-   - Menghasilkan kartu analisis risiko stok dan rekomendasi pengadaan yang mudah dipahami pemilik warung.
-   - Dual-Protection Fallback Engine: Jika AI offline atau timeout, mesin kalkulasi lokal otomatis menyajikan rekomendasi tanpa ada transaksi yang terganggu.
-6. **Asisten Bisnis Interaktif (Chatbot AI)**:
-   - Chatbot interaktif di dashboard (`/dashboard/assistant`) yang menjawab pertanyaan stok, evaluasi penjualan, dan simulasi restock berdasarkan data inventaris toko.
-7. **Laporan Penjualan & Valuasi Aset**:
-   - Rekap omzet multi-periode (Hari Ini, 7 Hari, 30 Hari, 90 Hari).
-   - Klasifikasi produk terlaris (*Top Selling*) dan rekap arus mutasi barang.
-   - Estimasi total nilai aset fisik persediaan.
+   - Menganalisis kondisi persediaan berdasarkan data riil (ADS, ROP, Lead Time, Estimasi Hari Habis) dan menyajikan narasi risiko bisnis dalam Bahasa Indonesia yang komunikatif.
+6. **Smart Restock Recommendation**:
+   - Menghitung titik pemesanan kembali (*Reorder Point*) dan memberikan rekomendasi kuantitas belanja sebelum stok toko habis.
+7. **AI Business Assistant**:
+   - Asisten percakapan cerdas yang terhubung dengan basis data toko untuk menjawab pertanyaan seputar produk terlaris, analisis stok kritis, dan simulasi skenario belanja.
+8. **Role-Based Access Control (RBAC)**:
+   - Pemisahan wewenang tegas antara akun Pemilik Toko (`OWNER`) dan Staf Kasir (`STAFF`) yang ditegakkan di level database dengan Supabase Row Level Security (RLS).
+9. **Laporan Performa Bisnis**:
+   - Rekapitulasi omzet multi-periode (Hari Ini, 7 Hari, 30 Hari, 90 Hari), grafik tren penjualan, peringkat produk terlaris, dan estimasi valuasi aset barang.
 
 ---
 
 ## 4. Tech Stack
 
 * **Frontend & Framework**: Next.js 16 (App Router + React 19 + Turbopack)
+* **Backend Runtime**: Next.js API Routes (Server Components & Route Handlers)
 * **Bahasa**: TypeScript (Strict Type Checking)
-* **Styling & UI**: Tailwind CSS v4, Lucide React Icons, Radix UI primitives
-* **Database & Auth**: Supabase (PostgreSQL 15+, Supabase Auth, Row-Level Security, Database Functions/RPC)
-* **AI Engine**: Google Gemini API (`gemini-3.5-flash`) via Google Gen AI SDK
+* **Styling & UI**: Tailwind CSS v4, Lucide React Icons
+* **Database & Auth**: Supabase (PostgreSQL 15+, Supabase Auth, Row-Level Security, Transaksional RPC)
+* **AI Model & Engine**: Google Gemini API (`gemini-3.5-flash`) dengan latensi rendah (`thinkingBudget: 0`)
 * **Validasi Skema**: Zod Runtime Validation
-* **Testing Suite**: Node.js Native Test Runner + `tsx` (55 Unit & Integration Tests)
+* **Testing Suite**: Node.js Native Test Runner + `tsx` (55 Unit & Integration Tests Lolos)
+* **Hosting & Deployment**: Vercel
 
 ---
 
 ## 5. AI Implementation
 
-* **Model yang Digunakan**: `gemini-3.5-flash`
-* **Metode Pemanggilan**: Server-Side REST API dengan Structured Output JSON & Conversational Context.
+* **Model yang Digunakan**: Google Gemini API (`gemini-3.5-flash`)
+* **Metode Pemanggilan**: Server-Side REST API dengan Structured Output JSON & Context-Augmented Generation.
 * **Peran AI**:
-  1. *Contextualizer & Explainer*: Menerjemahkan angka metrik matematis dari backend menjadi bahasa bisnis natural.
-  2. *Interactive Advisory*: Menjawab pertanyaan konsultasi pemilik toko dan memberikan panduan praktis restock.
+  1. *Analisis Kondisi Persediaan*: Mengidentifikasi produk berisiko kehabisan stok atau barang yang perputarannya lambat.
+  2. *Penjelasan Rekomendasi*: Menerjemahkan metrik matematis rumit menjadi narasi saran tindakan praktis.
+  3. *Asisten Pertanyaan Bisnis*: Konsultasi interaktif bagi pemilik usaha berbasis data riil toko.
 * **Batasan & Responsible AI**:
-  - AI dilarang keras mengarang (*hallucinate*) jumlah stok fisik, omzet, atau harga supplier.
-  - Kegagalan AI tidak pernah membatalkan atau memblokir transaksi kasir yang sah.
+  - AI dilarang keras mengarang (*hallucinate*) angka stok fisik, omzet, atau harga supplier.
+  - Kegagalan API AI tidak pernah membatalkan atau memblokir transaksi kasir yang sah (didukung sistem *fallback* deterministik lokal).
   - Hanya data ringkasan inventaris teragregasi yang dikirim ke model; data privasi pelanggan tidak pernah dibagikan.
 
 ---
@@ -110,7 +109,7 @@ Sistem memadukan perhitungan deterministik di sisi backend (Average Daily Sales,
    └── Autonomous Fallback Engine (Dual Protection)
              │
              ▼
-[ Hasil Rekomendasi & Jawaban Asisten Bisnis ]
+[ Dashboard & Rekomendasi Pintar ]
 ```
 
 ---
@@ -126,8 +125,8 @@ Sistem memadukan perhitungan deterministik di sisi backend (Average Daily Sales,
 ### Langkah Menjalankan:
 ```bash
 # 1. Clone repository
-git clone https://github.com/your-username/stokpintar-ai.git
-cd stokpintar-ai
+git clone https://github.com/kenkensigma/StokCerdasAI.git
+cd StokCerdasAI
 
 # 2. Install dependencies
 npm install
@@ -163,41 +162,41 @@ npm run build
 ---
 
 ## 8. Deployment URL
-* **URL Production**: `https://stokcerdas-ai.vercel.app` *(atau URL Vercel tim Anda)*
-* **Status**: Siap dideploy (Lolos build optimasi Next.js 16).
+* **Deployment URL**: [https://stok-cerdas-ai.vercel.app](https://stok-cerdas-ai.vercel.app)
+* **Status**: Siap diakses live oleh dewan juri.
 
 ---
 
 ## 9. Demo Account (Untuk Juri)
-Untuk mempermudah penjurian, gunakan akun demo yang sudah disiapkan:
+Untuk mempermudah pengujian oleh dewan juri, telah disediakan akun demo resmi yang sudah terisi data toko ritel dan 7 hari histori transaksi:
 
-| Peran | Email | Password | Keterangan |
+| Peran | Email | Password | Keterangan & Hak Akses |
 | :--- | :--- | :--- | :--- |
-| **Owner (Pemilik Toko)** | `demo.owner@stokcerdas.id` | *(Lihat form submission panitia)* | Akses penuh dashboard, kasir, analisis AI, laporan, pengaturan |
-| **Staff (Kasir)** | `demo.kasir@stokcerdas.id` | *(Lihat form submission panitia)* | Akses operasional kasir POS dan pencatatan stok masuk |
-
-> *Catatan Keamanan: Password akun demo dikirimkan melalui form submission resmi panitia, tidak dipublikasikan secara terbuka di repository.*
+| **Owner (Pemilik Toko)** | `owner@stokcerdas.id` | `Password123!` | Akses penuh: Katalog Produk CRUD, Koreksi Opname Stok, Void Transaksi, Analisis AI, Asisten AI, Laporan Finansial, dan Manajemen Tim. |
+| **Staff (Kasir)** | `staff@stokcerdas.id` | `Password123!` | Akses operasional harian: Kasir POS cepat dan pencatatan barang masuk. Menu sensitif otomatis dibatasi. |
 
 ---
 
 ## 10. Known Limitations
-1. **Model Offline / Jeda Waktu Gemini**: Pada kondisi koneksi sangat lambat, sistem beralih menggunakan kalkulasi deterministik fallback lokal secara otomatis agar kasir tidak terhenti.
-2. **Kebutuhan Data Awal**: Akurasi proyeksi hari habis stok membutuhkan minimal 3–7 hari riwayat transaksi kasir agar pola penjualan representatif.
-3. **Integrasi Perangkat Keras**: Pemindaian barcode saat ini menggunakan input keyboard/scanner USB standar, belum mendukung kamera native WebRTC.
+1. **Model Offline / Jeda Jaringan**: Pada kondisi koneksi internet terputus, sistem otomatis beralih menggunakan kalkulasi deterministik *fallback* lokal sehingga kasir dan stok fisik tidak pernah macet.
+2. **Kebutuhan Data Awal**: Akurasi proyeksi hari habis stok memerlukan minimal 3–7 hari riwayat transaksi kasir agar tren laju harian representatif.
+3. **Integrasi Perangkat Keras**: Pemindaian barcode saat ini menggunakan input keyboard/scanner barcode USB standar, belum mendukung kamera native WebRTC.
 
 ---
 
 ## 11. Third-party Resources / Credits
 * [Next.js](https://nextjs.org/) — React Framework
 * [Tailwind CSS](https://tailwindcss.com/) — Utility-first CSS framework
-* [Supabase](https://supabase.com/) — Open source Firebase alternative (PostgreSQL, Auth, RLS)
-* [Google Gemini API](https://ai.google.dev/) — Large Language Model API
+* [Supabase](https://supabase.com/) — Database PostgreSQL & Autentikasi dengan Row Level Security
+* [Google Gemini API](https://ai.google.dev/) — Large Language Model API (`gemini-3.5-flash`)
 * [Lucide Icons](https://lucide.dev/) — Open-source icon library
-* [Zod](https://zod.dev/) — TypeScript-first schema declaration and validation
+* [Zod](https://zod.dev/) — TypeScript-first schema declaration and runtime validation
 
 ---
 
 ## 12. Team Members
+
+**Tim: Ramayana (Primakara University)**
 
 | Nama | Peran | Tanggung Jawab |
 | :--- | :--- | :--- |
@@ -208,4 +207,4 @@ Untuk mempermudah penjurian, gunakan akun demo yang sudah disiapkan:
 ---
 
 ## 📜 Lisensi
-Lisensi MIT. Dibangun dengan bangga untuk memajukan UMKM ritel Bali dan Indonesia pada **Bali DigiFest 2026**.
+Lisensi MIT. Dibangun dengan bangga untuk memajukan UMKM ritel Bali dan Indonesia pada **Bali DigiFest 2026: AI Web Innovation Challenge**.
