@@ -201,9 +201,9 @@ Untuk mempermudah penjurian, gunakan akun demo yang sudah disiapkan:
 
 | Nama | Peran | Tanggung Jawab |
 | :--- | :--- | :--- |
-| **I Gede Raditya Putra** | Lead Developer & Architect | Desain sistem, arsitektur database, integrasi AI |
-| **[Nama Anggota 1]** | Frontend & UI/UX Engineer | Antarmuka pengguna, dashboard kasir, visual styling |
-| **[Nama Anggota 2]** | Backend & QA Engineer | Implementasi RPC database, integrasi test suite, dokumentasi |
+| **I Gede Raditya Putra** | Lead Full-Stack Developer & AI Architect | Perancangan arsitektur sistem, implementasi seluruh kode program (frontend, backend, database PostgreSQL & RLS), integrasi AI, serta otomasi test suite. |
+| **Ni Putu Alya Mukhbita Devi** | Technical Writer & Proposal Lead | Penyusunan dokumen proposal kompetisi, penulisan narasi solusi, penyelarasan format panduan, dan dokumentasi submission. |
+| **I Nyoman Nityananda Rama** | Product Ideation & Business Researcher | Riset kebutuhan dan pain points UMKM ritel lokal Bali, perumusan ide solusi bisnis, studi produk kompetitor, dan konseptualisasi fitur. |
 
 ---
 
