@@ -4,7 +4,7 @@ import { getStoreDetails, updateStoreDetails } from "@/services/store-settings.s
 
 export async function GET() {
   try {
-    const member = await requireStoreMember("view_dashboard");
+    const member = await requireStoreMember("manage_settings");
     const store = await getStoreDetails(member.storeId);
 
     return NextResponse.json({

@@ -4,7 +4,7 @@ import { askBusinessAssistant, type AssistantMessage } from "@/services/ai-assis
 
 export async function POST(request: NextRequest) {
   try {
-    const member = await requireStoreMember("view_inventory_analysis");
+    const member = await requireStoreMember("use_ai_assistant");
 
     const body = await request.json();
     const message = body?.message;

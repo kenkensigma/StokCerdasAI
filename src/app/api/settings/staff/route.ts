@@ -4,7 +4,7 @@ import { getStoreMembers, createStaffMember } from "@/services/store-settings.se
 
 export async function GET() {
   try {
-    const member = await requireStoreMember("view_dashboard");
+    const member = await requireStoreMember("manage_team");
     const staffList = await getStoreMembers(member.storeId);
 
     return NextResponse.json({

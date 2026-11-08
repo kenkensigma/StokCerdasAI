@@ -20,9 +20,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { RoleRestrictedCard } from "@/components/auth/role-restricted-card";
+import { useAuthSession } from "@/hooks/use-auth-session";
 import type { StoreDetails, StoreMemberItem } from "@/services/store-settings.service";
 
 export default function SettingsPage() {
+  const { isOwner, isLoading: isAuthLoading } = useAuthSession();
   const [activeTab, setActiveTab] = React.useState<"store" | "team">("store");
 
   // Store profile states
@@ -210,6 +213,15 @@ export default function SettingsPage() {
       return dateStr;
     }
   };
+
+  if (!isAuthLoading && !isOwner) {
+    return (
+      <RoleRestrictedCard
+        title="Pengaturan Toko — Khusus Pemilik Toko"
+        description="Halaman profil toko dan penambahan akun staf hanya dapat diakses oleh Pemilik Toko (OWNER). Akun Anda terdaftar sebagai Staf Toko (STAFF) dengan wewenang operasional kasir dan stok fisik."
+      />
+    );
+  }
 
   return (
     <div className="space-y-6">

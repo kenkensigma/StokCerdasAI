@@ -200,6 +200,16 @@ export default function ProductsPage() {
         </div>
       )}
 
+      {/* Staff Mode Operational Badge */}
+      {!canManage && !isLoading && !error && (
+        <div className="rounded-lg border border-blue-100 bg-blue-50/70 p-3 flex items-center justify-between text-xs text-blue-900">
+          <div className="flex items-center gap-2">
+            <span className="font-semibold px-2 py-0.5 rounded bg-blue-100 text-blue-800 text-[11px]">Mode Staf</span>
+            <span>Akses katalog produk hanya-baca (Read-Only). Penambahan dan perubahan produk dikelola oleh Pemilik Toko.</span>
+          </div>
+        </div>
+      )}
+
       {/* Content */}
       {isLoading ? (
         <div className="space-y-4">

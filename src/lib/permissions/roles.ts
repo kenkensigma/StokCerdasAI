@@ -15,7 +15,9 @@ export type Permission =
   | "void_sales"
   | "record_stock_in"
   | "adjust_stock"
-  | "view_inventory_analysis"
+  | "view_inventory_analysis" // AI analysis & predictions
+  | "use_ai_assistant"        // AI business assistant chat
+  | "view_reports"            // Financial & business reports
   | "manage_team"
   | "manage_settings";
 
@@ -30,6 +32,8 @@ const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     "record_stock_in",
     "adjust_stock",
     "view_inventory_analysis",
+    "use_ai_assistant",
+    "view_reports",
     "manage_team",
     "manage_settings",
   ],
@@ -39,7 +43,6 @@ const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     "record_sales",
     "view_sales",
     "record_stock_in",
-    "view_inventory_analysis",
   ],
 };
 

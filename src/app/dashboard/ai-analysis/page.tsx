@@ -18,6 +18,8 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/ui/empty-state";
+import { RoleRestrictedCard } from "@/components/auth/role-restricted-card";
+import { useAuthSession } from "@/hooks/use-auth-session";
 import type { StoredAiInsight } from "@/services/ai-analysis.service";
 
 interface AiInsightsResponseData {
@@ -42,6 +44,7 @@ async function fetchInsightsApi(): Promise<AiInsightsResponseData> {
 }
 
 export default function AiAnalysisPage() {
+  const { isOwner, isLoading: isAuthLoading } = useAuthSession();
   const [data, setData] = React.useState<AiInsightsResponseData | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
   const [isRefreshing, setIsRefreshing] = React.useState(false);
@@ -170,6 +173,15 @@ export default function AiAnalysisPage() {
         return <Badge variant="waiting">Menunggu Data</Badge>;
     }
   };
+
+  if (!isAuthLoading && !isOwner) {
+    return (
+      <RoleRestrictedCard
+        title="Analisis Stok AI — Khusus Pemilik Toko"
+        description="Fitur analisis persediaan prediktif dan rekomendasi restock proaktif merupakan fitur manajemen strategis untuk Pemilik Toko (OWNER). Akun Anda terdaftar sebagai Staf Toko (STAFF)."
+      />
+    );
+  }
 
   return (
     <div className="space-y-6">

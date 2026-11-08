@@ -17,11 +17,13 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { siteConfig } from "@/config/site";
+import type { Role } from "@/lib/permissions/roles";
 
 interface SidebarProps {
   isOpen?: boolean;
   onClose?: () => void;
   storeName?: string;
+  role?: Role;
 }
 
 const navItems = [
@@ -29,46 +31,55 @@ const navItems = [
     title: "Ringkasan",
     href: "/dashboard",
     icon: LayoutDashboard,
+    ownerOnly: false,
   },
   {
     title: "Produk",
     href: "/dashboard/products",
     icon: Package,
+    ownerOnly: false,
   },
   {
     title: "Inventaris",
     href: "/dashboard/inventory",
     icon: Warehouse,
+    ownerOnly: false,
   },
   {
     title: "Penjualan",
     href: "/dashboard/sales",
     icon: ShoppingCart,
+    ownerOnly: false,
   },
   {
     title: "Analisis AI",
     href: "/dashboard/ai-analysis",
     icon: BrainCircuit,
+    ownerOnly: true,
   },
   {
     title: "Asisten AI",
     href: "/dashboard/assistant",
     icon: Bot,
+    ownerOnly: true,
   },
   {
     title: "Laporan",
     href: "/dashboard/reports",
     icon: BarChart3,
+    ownerOnly: true,
   },
   {
     title: "Pengaturan",
     href: "/dashboard/settings",
     icon: Settings,
+    ownerOnly: true,
   },
 ];
 
-export function Sidebar({ isOpen = false, onClose, storeName = "Toko Saya" }: SidebarProps) {
+export function Sidebar({ isOpen = false, onClose, storeName = "Toko Saya", role = "OWNER" }: SidebarProps) {
   const pathname = usePathname();
+  const visibleNavItems = navItems.filter((item) => !item.ownerOnly || role === "OWNER");
 
   return (
     <>
@@ -123,7 +134,7 @@ export function Sidebar({ isOpen = false, onClose, storeName = "Toko Saya" }: Si
 
         {/* Navigation Items */}
         <nav className="flex-1 space-y-1 overflow-y-auto p-3">
-          {navItems.map((item) => {
+          {visibleNavItems.map((item) => {
             const Icon = item.icon;
             const isActive =
               item.href === "/dashboard"
@@ -157,8 +168,21 @@ export function Sidebar({ isOpen = false, onClose, storeName = "Toko Saya" }: Si
         </nav>
 
         {/* Sidebar Footer */}
-        <div className="border-t border-slate-200 p-4 text-xs text-slate-400">
-          <p>© 2026 {siteConfig.name}</p>
+        <div className="border-t border-slate-200 p-4 text-xs text-slate-500">
+          <div className="mb-2 flex items-center justify-between">
+            <span className="text-[11px] font-medium text-slate-400">Mode Akses:</span>
+            <span
+              className={cn(
+                "rounded px-1.5 py-0.5 text-[11px] font-semibold",
+                role === "OWNER"
+                  ? "bg-blue-50 text-blue-700 border border-blue-200"
+                  : "bg-amber-50 text-amber-700 border border-amber-200"
+              )}
+            >
+              {role === "OWNER" ? "Owner (Penuh)" : "Staf (Kasir)"}
+            </span>
+          </div>
+          <p className="text-[11px] text-slate-400">© 2026 {siteConfig.name}</p>
         </div>
       </aside>
     </>

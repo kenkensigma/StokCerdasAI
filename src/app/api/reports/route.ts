@@ -4,7 +4,7 @@ import { getStoreReports } from "@/services/reports.service";
 
 export async function GET(request: NextRequest) {
   try {
-    const member = await requireStoreMember("view_inventory_analysis");
+    const member = await requireStoreMember("view_reports");
     const { searchParams } = new URL(request.url);
 
     const periodParam = searchParams.get("periodDays");

@@ -56,6 +56,8 @@ test("OWNER has full store permissions", () => {
     "record_stock_in",
     "adjust_stock",
     "view_inventory_analysis",
+    "use_ai_assistant",
+    "view_reports",
     "manage_team",
     "manage_settings",
   ];
@@ -76,14 +78,13 @@ test("STAFF has restricted operational permissions and cannot execute OWNER acti
   assert.strictEqual(isOwner(staffSession.role), false);
   assert.strictEqual(isStaff(staffSession.role), true);
 
-  // Allowed operations
+  // Allowed operational operations
   const allowedPerms: Permission[] = [
     "view_dashboard",
     "view_products",
     "record_sales",
     "view_sales",
     "record_stock_in",
-    "view_inventory_analysis",
   ];
 
   for (const perm of allowedPerms) {
@@ -91,11 +92,14 @@ test("STAFF has restricted operational permissions and cannot execute OWNER acti
     assert.strictEqual(check.allowed, true, `Staff should be allowed ${perm}`);
   }
 
-  // Forbidden operations
+  // Forbidden operations (restricted to OWNER only)
   const forbiddenPerms: Permission[] = [
     "manage_products",
     "void_sales",
     "adjust_stock",
+    "view_inventory_analysis",
+    "use_ai_assistant",
+    "view_reports",
     "manage_team",
     "manage_settings",
   ];

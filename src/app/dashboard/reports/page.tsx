@@ -10,6 +10,8 @@ import {
 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { RoleRestrictedCard } from "@/components/auth/role-restricted-card";
+import { useAuthSession } from "@/hooks/use-auth-session";
 import type { BusinessReportData } from "@/services/reports.service";
 
 const PERIOD_OPTIONS = [
@@ -20,6 +22,7 @@ const PERIOD_OPTIONS = [
 ];
 
 export default function ReportsPage() {
+  const { isOwner, isLoading: isAuthLoading } = useAuthSession();
   const [periodDays, setPeriodDays] = React.useState<number>(7);
   const [data, setData] = React.useState<BusinessReportData | null>(null);
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
@@ -76,6 +79,15 @@ export default function ReportsPage() {
       return dateStr;
     }
   };
+
+  if (!isAuthLoading && !isOwner) {
+    return (
+      <RoleRestrictedCard
+        title="Laporan Finansial — Khusus Pemilik Toko"
+        description="Laporan performa finansial, omzet penjualan, dan valuasi aset toko merupakan informasi strategis yang hanya dapat diakses oleh Pemilik Toko (OWNER). Akun Anda terdaftar sebagai Staf Toko (STAFF)."
+      />
+    );
+  }
 
   return (
     <div className="space-y-6">

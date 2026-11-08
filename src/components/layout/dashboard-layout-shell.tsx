@@ -29,6 +29,7 @@ export function DashboardLayoutShell({
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
         storeName={storeName}
+        role={role}
       />
 
       {/* Main Column */}

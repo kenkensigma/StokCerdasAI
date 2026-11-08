@@ -16,10 +16,12 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { StatusIndicator } from "@/components/ui/status-indicator";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAuthSession } from "@/hooks/use-auth-session";
 import type { StoreIntelligenceResponse } from "@/services/intelligence.service";
 import type { StoredAiInsight } from "@/services/ai-analysis.service";
 
 export default function DashboardOverviewPage() {
+  const { isOwner } = useAuthSession();
   const [intel, setIntel] = React.useState<StoreIntelligenceResponse | null>(null);
   const [aiInsight, setAiInsight] = React.useState<StoredAiInsight | null>(null);
   const [todaySales, setTodaySales] = React.useState<{ totalAmount: number; count: number }>({
@@ -117,13 +119,23 @@ export default function DashboardOverviewPage() {
             <ShoppingCart className="h-4 w-4" aria-hidden="true" />
             Catat Penjualan
           </Link>
-          <Link
-            href="/dashboard/products"
-            className="inline-flex h-10 items-center justify-center gap-1.5 rounded-md border border-slate-300 bg-white px-3.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
-          >
-            <Plus className="h-4 w-4" aria-hidden="true" />
-            Tambah Produk
-          </Link>
+          {isOwner ? (
+            <Link
+              href="/dashboard/products"
+              className="inline-flex h-10 items-center justify-center gap-1.5 rounded-md border border-slate-300 bg-white px-3.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
+            >
+              <Plus className="h-4 w-4" aria-hidden="true" />
+              Tambah Produk
+            </Link>
+          ) : (
+            <Link
+              href="/dashboard/inventory"
+              className="inline-flex h-10 items-center justify-center gap-1.5 rounded-md border border-slate-300 bg-white px-3.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
+            >
+              <Boxes className="h-4 w-4" aria-hidden="true" />
+              Barang Masuk
+            </Link>
+          )}
         </div>
       </div>
 
@@ -266,64 +278,107 @@ export default function DashboardOverviewPage() {
         </div>
 
         {/* AI Insight Snapshot Card (1 Col) */}
+        {/* Right Column: AI Context Snapshot (Owner) or Operational Guide (Staff) */}
         <div>
-          <Card className="h-full flex flex-col justify-between">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <Badge variant="default" className="text-xs font-medium gap-1 bg-blue-50 text-blue-700 border-blue-200">
-                  <Sparkles className="h-3.5 w-3.5 text-blue-600" aria-hidden="true" />
-                  AI Inventory Analyzer
-                </Badge>
-                <span className="text-xs text-slate-400">StokCerdas AI</span>
-              </div>
-              <CardTitle className="text-base font-semibold mt-2 text-slate-900">
-                {aiInsight ? aiInsight.productName : "Analisis Risiko Terkini"}
-              </CardTitle>
-              <CardDescription className="text-xs text-slate-500">
-                {aiInsight
-                  ? `SKU: ${aiInsight.productSku} · Stok: ${aiInsight.currentStock} ${aiInsight.productUnit}`
-                  : "Dihasilkan dari metrik deterministik backend dan dijelaskan oleh AI"}
-              </CardDescription>
-            </CardHeader>
+          {isOwner ? (
+            <Card className="h-full flex flex-col justify-between">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <Badge variant="default" className="text-xs font-medium gap-1 bg-blue-50 text-blue-700 border-blue-200">
+                    <Sparkles className="h-3.5 w-3.5 text-blue-600" aria-hidden="true" />
+                    AI Inventory Analyzer
+                  </Badge>
+                  <span className="text-xs text-slate-400">StokCerdas AI</span>
+                </div>
+                <CardTitle className="text-base font-semibold mt-2 text-slate-900">
+                  {aiInsight ? aiInsight.productName : "Analisis Risiko Terkini"}
+                </CardTitle>
+                <CardDescription className="text-xs text-slate-500">
+                  {aiInsight
+                    ? `SKU: ${aiInsight.productSku} · Stok: ${aiInsight.currentStock} ${aiInsight.productUnit}`
+                    : "Dihasilkan dari metrik deterministik backend dan dijelaskan oleh AI"}
+                </CardDescription>
+              </CardHeader>
 
-            <CardContent className="flex-1 flex flex-col justify-between text-xs space-y-4">
-              {isLoading ? (
-                <div className="space-y-2 py-4">
-                  <Skeleton className="h-20 w-full" />
-                </div>
-              ) : aiInsight ? (
-                <div className="rounded-lg bg-blue-50/70 border border-blue-100 p-3.5 space-y-2">
-                  <p className="font-semibold text-blue-900">
-                    {aiInsight.analysisResult?.summary || "Rekomendasi Restock"}
-                  </p>
-                  <p className="text-slate-700 leading-relaxed">
-                    {aiInsight.analysisResult?.riskExplanation ||
-                      aiInsight.analysisResult?.recommendation ||
-                      "Persediaan dipantau oleh AI."}
-                  </p>
-                  {aiInsight.suggestedRestockQuantity > 0 && (
-                    <div className="pt-1 text-xs text-blue-800 font-medium">
-                      Saran kuantitas restock: {aiInsight.suggestedRestockQuantity} {aiInsight.productUnit}
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="rounded-lg bg-slate-50 border border-slate-200 p-3.5 text-slate-600 text-xs">
-                  Belum ada analisis produk. Buka menu AI Inventory Analyzer untuk memulai analisis.
-                </div>
-              )}
+              <CardContent className="flex-1 flex flex-col justify-between text-xs space-y-4">
+                {isLoading ? (
+                  <div className="space-y-2 py-4">
+                    <Skeleton className="h-20 w-full" />
+                  </div>
+                ) : aiInsight ? (
+                  <div className="rounded-lg bg-blue-50/70 border border-blue-100 p-3.5 space-y-2">
+                    <p className="font-semibold text-blue-900">
+                      {aiInsight.analysisResult?.summary || "Rekomendasi Restock"}
+                    </p>
+                    <p className="text-slate-700 leading-relaxed">
+                      {aiInsight.analysisResult?.riskExplanation ||
+                        aiInsight.analysisResult?.recommendation ||
+                        "Persediaan dipantau oleh AI."}
+                    </p>
+                    {aiInsight.suggestedRestockQuantity > 0 && (
+                      <div className="pt-1 text-xs text-blue-800 font-medium">
+                        Saran kuantitas restock: {aiInsight.suggestedRestockQuantity} {aiInsight.productUnit}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="rounded-lg bg-slate-50 border border-slate-200 p-3.5 text-slate-600 text-xs">
+                    Belum ada analisis produk. Buka menu AI Inventory Analyzer untuk memulai analisis.
+                  </div>
+                )}
 
-              <div className="border-t border-slate-100 pt-3">
-                <Link
-                  href="/dashboard/ai-analysis"
-                  className="w-full inline-flex h-9 items-center justify-center gap-1.5 rounded-md bg-white border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-colors"
-                >
-                  Buka Halaman Analisis Lengkap
-                  <ArrowRight className="h-3.5 w-3.5 text-slate-400" />
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
+                <div className="border-t border-slate-100 pt-3">
+                  <Link
+                    href="/dashboard/ai-analysis"
+                    className="w-full inline-flex h-9 items-center justify-center gap-1.5 rounded-md bg-white border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-colors"
+                  >
+                    Buka Halaman Analisis Lengkap
+                    <ArrowRight className="h-3.5 w-3.5 text-slate-400" />
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card className="h-full flex flex-col justify-between border-blue-100 bg-blue-50/20">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <Badge variant="default" className="text-xs font-medium gap-1 bg-amber-50 text-amber-700 border-amber-200">
+                    Akses Operasional
+                  </Badge>
+                  <span className="text-xs text-slate-400">Staf Kasir</span>
+                </div>
+                <CardTitle className="text-base font-semibold mt-2 text-slate-900">
+                  Panduan Kasir & Persediaan
+                </CardTitle>
+                <CardDescription className="text-xs text-slate-500">
+                  Hak akses staf mencakup pencatatan transaksi kasir dan mutasi barang masuk.
+                </CardDescription>
+              </CardHeader>
+
+              <CardContent className="flex-1 flex flex-col justify-between text-xs space-y-4">
+                <div className="space-y-2.5 text-xs text-slate-600 leading-relaxed">
+                  <div className="rounded-lg bg-white border border-slate-200 p-3 shadow-xs">
+                    <p className="font-semibold text-slate-900 mb-1">Kasir POS Cepat</p>
+                    <p>Catat setiap transaksi penjualan langsung agar stok fisik di rak otomatis terpotong seketika.</p>
+                  </div>
+                  <div className="rounded-lg bg-white border border-slate-200 p-3 shadow-xs">
+                    <p className="font-semibold text-slate-900 mb-1">Penerimaan Barang Masuk</p>
+                    <p>Catat pasokan barang baru dari supplier melalui menu Inventaris agar jumlah stok selalu akurat.</p>
+                  </div>
+                </div>
+
+                <div className="border-t border-slate-200 pt-3">
+                  <Link
+                    href="/dashboard/sales"
+                    className="w-full inline-flex h-9 items-center justify-center gap-1.5 rounded-md bg-blue-600 text-xs font-semibold text-white hover:bg-blue-700 transition-colors shadow-xs"
+                  >
+                    <ShoppingCart className="h-4 w-4" />
+                    Buka Kasir POS Sekarang
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </div>

@@ -12,6 +12,8 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { RoleRestrictedCard } from "@/components/auth/role-restricted-card";
+import { useAuthSession } from "@/hooks/use-auth-session";
 
 interface ChatMessage {
   id: string;
@@ -52,6 +54,7 @@ const QUICK_PROMPTS = [
 ];
 
 export default function AssistantPage() {
+  const { isOwner, isLoading: isAuthLoading } = useAuthSession();
   const [messages, setMessages] = React.useState<ChatMessage[]>([INITIAL_MESSAGE]);
   const [inputValue, setInputValue] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(false);
@@ -164,6 +167,15 @@ export default function AssistantPage() {
       );
     });
   };
+
+  if (!isAuthLoading && !isOwner) {
+    return (
+      <RoleRestrictedCard
+        title="Asisten Bisnis AI — Khusus Pemilik Toko"
+        description="Fitur konsultasi cerdas dan analisis performa toko langsung dari basis data hanya dapat diakses oleh Pemilik Toko (OWNER). Akun Anda terdaftar sebagai Staf Toko (STAFF)."
+      />
+    );
+  }
 
   return (
     <div className="space-y-6">

@@ -237,6 +237,16 @@ export default function InventoryPage() {
         </div>
       )}
 
+      {/* Staff Mode Operational Badge */}
+      {!isOwner && !isLoading && !error && (
+        <div className="rounded-lg border border-blue-100 bg-blue-50/70 p-3 flex items-center justify-between text-xs text-blue-900">
+          <div className="flex items-center gap-2">
+            <span className="font-semibold px-2 py-0.5 rounded bg-blue-100 text-blue-800 text-[11px]">Mode Staf</span>
+            <span>Anda memiliki hak akses mencatat Barang Masuk. Wewenang penyesuaian koreksi opname manual hanya dimiliki oleh Pemilik Toko.</span>
+          </div>
+        </div>
+      )}
+
       {/* Main Tab Content */}
       {isLoading ? (
         <div className="space-y-4">
